@@ -1,0 +1,21 @@
+{
+    "name": "wmtharshp/authentication",
+    "description": "Authentication & Authorization Implement",
+    "type": "library",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Wmtharshp\\Authentication\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Harsh Parmar",
+            "email": "harshp@webmobtech.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {
+        "guzzlehttp/guzzle": "^7.0.1"
+    }
+}
