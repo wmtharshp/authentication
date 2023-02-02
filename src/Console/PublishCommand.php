@@ -10,7 +10,7 @@ class PublishCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'publish:name';
+    protected $signature = 'publish:auth';
 
     /**
      * The console command description.

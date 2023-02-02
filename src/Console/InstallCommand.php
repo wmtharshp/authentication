@@ -39,14 +39,19 @@ class InstallCommand extends Command
 
         copy(__DIR__.'/../Contracts/CreateNewUser.php', app_path('Actions/Contracts/CreateNewUser.php'));
         copy(__DIR__.'/../Contracts/PasswordValidationRules.php', app_path('Actions/Contracts/PasswordValidationRules.php'));
-        copy(__DIR__.'/../DataTables/UsersDataTable.php', app_path('DataTables/UsersDataTable.php'));
-        copy(__DIR__.'/../DataTables/RolesDataTable.php', app_path('DataTables/RolesDataTable.php'));
-        copy(__DIR__.'/../DataTables/PermissionsDataTable.php', app_path('DataTables/PermissionsDataTable.php'));
         copy(__DIR__.'/../Rules/Password.php', app_path('/Rules/Password.php'));
 
 
-        app()->make(\App\Composer::class)->run(['require', 'yajra/laravel-datatables-oracle']);
-        app()->make(\App\Composer::class)->run(['require', 'yajra/laravel-datatables']);
+        $version = Str::before(app()->version(),".");
+        if($version > 8){
+            copy(__DIR__.'/../DataTables/UsersDataTable.php', app_path('DataTables/UsersDataTable.php'));
+            copy(__DIR__.'/../DataTables/RolesDataTable.php', app_path('DataTables/RolesDataTable.php'));
+            copy(__DIR__.'/../DataTables/PermissionsDataTable.php', app_path('DataTables/PermissionsDataTable.php'));
+            app()->make(\App\Composer::class)->run(['require', 'yajra/laravel-datatables-oracle']);
+            app()->make(\App\Composer::class)->run(['require', 'yajra/laravel-datatables']);
+        }else{
+            app()->make(\App\Composer::class)->run(['require', 'yajra/laravel-datatables-oracle']);
+        }
         app()->make(\App\Composer::class)->run(['require', 'laravel/socialite']);
         app()->make(\App\Composer::class)->run(['require', 'mckenziearts/laravel-notify']);
         app()->make(\App\Composer::class)->run(['require', 'spatie/laravel-permission']);
@@ -68,18 +73,33 @@ class InstallCommand extends Command
             $str = file_get_contents(base_path('config/app.php'));
             $slice = Str::after($str, $search);
     
-            $aliases = "// 'ExampleClass' => App\Example\ExampleClass::class,";
-            $new_slice = Str::after($slice, $aliases);
-            $old_slice = Str::before($slice, $aliases).'"DataTables" => Yajra\DataTables\Facades\DataTables::class,'.$new_slice;
-    
-            $first_slice = Str::before($str, $search);
-            $new_content = $first_slice . "
-            App\Providers\RouteServiceProvider::class, 
-            Spatie\Permission\PermissionServiceProvider::class,
-            Mckenziearts\Notify\LaravelNotifyServiceProvider::class,
-            Yajra\DataTables\DataTablesServiceProvider::class,
-            Yajra\DataTables\HtmlServiceProvider::class,".$old_slice;
-            file_put_contents(base_path('config/app.php'),$new_content );
+            $version = Str::before(app()->version(),".");
+            if($version > 8){
+                $aliases = "// 'ExampleClass' => App\Example\ExampleClass::class,";
+                $new_slice = Str::after($slice, $aliases);
+                $old_slice = Str::before($slice, $aliases).$aliases.'"DataTables" => Yajra\DataTables\Facades\DataTables::class,'.$new_slice;
+        
+                $first_slice = Str::before($str, $search);
+                $new_content = $first_slice . "
+                App\Providers\RouteServiceProvider::class, 
+                Spatie\Permission\PermissionServiceProvider::class,
+                Mckenziearts\Notify\LaravelNotifyServiceProvider::class,
+                Yajra\DataTables\DataTablesServiceProvider::class,
+                Yajra\DataTables\HtmlServiceProvider::class,".$old_slice;
+                file_put_contents(base_path('config/app.php'),$new_content );
+            }else{
+                $aliases = "'View' => Illuminate\Support\Facades\View::class,";
+                $new_slice = Str::after($slice, $aliases);
+                $old_slice = Str::before($slice, $aliases).$aliases.'"DataTables" => Yajra\DataTables\Facades\DataTables::class,'.$new_slice;
+        
+                $first_slice = Str::before($str, $search);
+                $new_content = $first_slice . "
+                App\Providers\RouteServiceProvider::class, 
+                Spatie\Permission\PermissionServiceProvider::class,
+                Mckenziearts\Notify\LaravelNotifyServiceProvider::class,
+                Yajra\DataTables\DataTablesServiceProvider::class,".$old_slice;
+                file_put_contents(base_path('config/app.php'),$new_content );
+            }
         }
     }
 
