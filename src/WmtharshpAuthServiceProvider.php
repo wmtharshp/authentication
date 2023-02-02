@@ -6,7 +6,7 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Contracts\Auth\StatefulGuard;
 use Illuminate\Support\Facades\Auth;
-
+use Illuminate\Support\Str;
 class WmtharshpAuthServiceProvider extends ServiceProvider
 {
        /**
