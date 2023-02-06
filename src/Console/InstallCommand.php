@@ -36,10 +36,16 @@ class InstallCommand extends Command
         (new Filesystem)->ensureDirectoryExists(app_path('Actions/Contracts'));
         (new Filesystem)->ensureDirectoryExists(app_path('DataTables'));
         (new Filesystem)->ensureDirectoryExists(app_path('Rules'));
+        (new Filesystem)->ensureDirectoryExists(app_path('Helper'));
+        (new Filesystem)->ensureDirectoryExists(app_path('Notifications'));
 
         copy(__DIR__.'/../Contracts/CreateNewUser.php', app_path('Actions/Contracts/CreateNewUser.php'));
         copy(__DIR__.'/../Contracts/PasswordValidationRules.php', app_path('Actions/Contracts/PasswordValidationRules.php'));
         copy(__DIR__.'/../Rules/Password.php', app_path('/Rules/Password.php'));
+        copy(__DIR__.'/../Helper/EmailActivation.php', app_path('/Helper/EmailActivation.php'));
+        copy(__DIR__.'/../Notifications/GeneratePassword.php', app_path('/Notifications/GeneratePassword.php'));
+        copy(__DIR__.'/../Notifications/VerifyEmail.php', app_path('/Notifications/VerifyEmail.php'));
+        copy(__DIR__.'/../Models/Activation.php', app_path('/Models/Activation.php'));
 
 
         $version = Str::before(app()->version(),".");
@@ -52,6 +58,7 @@ class InstallCommand extends Command
         }else{
             app()->make(\App\Composer::class)->run(['require', 'yajra/laravel-datatables-oracle']);
         }
+        app()->make(\App\Composer::class)->run(['require', 'mews/captcha']);
         app()->make(\App\Composer::class)->run(['require', 'laravel/socialite']);
         app()->make(\App\Composer::class)->run(['require', 'mckenziearts/laravel-notify']);
         app()->make(\App\Composer::class)->run(['require', 'spatie/laravel-permission']);
@@ -77,7 +84,8 @@ class InstallCommand extends Command
             if($version > 8){
                 $aliases = "// 'ExampleClass' => App\Example\ExampleClass::class,";
                 $new_slice = Str::after($slice, $aliases);
-                $old_slice = Str::before($slice, $aliases).$aliases.'"DataTables" => Yajra\DataTables\Facades\DataTables::class,'.$new_slice;
+                $old_slice = Str::before($slice, $aliases).$aliases.'"DataTables" => Yajra\DataTables\Facades\DataTables::class,
+                "Captcha" => Mews\Captcha\Facades\Captcha::class,'.$new_slice;
         
                 $first_slice = Str::before($str, $search);
                 $new_content = $first_slice . "
@@ -85,17 +93,20 @@ class InstallCommand extends Command
                 Spatie\Permission\PermissionServiceProvider::class,
                 Mckenziearts\Notify\LaravelNotifyServiceProvider::class,
                 Yajra\DataTables\DataTablesServiceProvider::class,
+                Mews\Captcha\CaptchaServiceProvider::class,
                 Yajra\DataTables\HtmlServiceProvider::class,".$old_slice;
                 file_put_contents(base_path('config/app.php'),$new_content );
             }else{
                 $aliases = "'View' => Illuminate\Support\Facades\View::class,";
                 $new_slice = Str::after($slice, $aliases);
-                $old_slice = Str::before($slice, $aliases).$aliases.'"DataTables" => Yajra\DataTables\Facades\DataTables::class,'.$new_slice;
+                $old_slice = Str::before($slice, $aliases).$aliases.'"DataTables" => Yajra\DataTables\Facades\DataTables::class,
+                "Captcha" => Mews\Captcha\Facades\Captcha::class,'.$new_slice;
         
                 $first_slice = Str::before($str, $search);
                 $new_content = $first_slice . "
                 App\Providers\RouteServiceProvider::class, 
                 Spatie\Permission\PermissionServiceProvider::class,
+                Mews\Captcha\CaptchaServiceProvider::class,
                 Mckenziearts\Notify\LaravelNotifyServiceProvider::class,
                 Yajra\DataTables\DataTablesServiceProvider::class,".$old_slice;
                 file_put_contents(base_path('config/app.php'),$new_content );
