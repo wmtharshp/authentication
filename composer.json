@@ -16,6 +16,13 @@
     ],
     "minimum-stability": "dev",
     "require": {
-        "guzzlehttp/guzzle": "^7.0.1"
-    }
+        "guzzlehttp/guzzle": "^7.0.1",
+        "vendor/wmtharshp": "dev-main"
+    },
+    "repositories": [
+        {
+            "type": "vcs",
+            "url":  "https://github.com/wmtharshp/authentication.git"
+        }
+    ]
 }
